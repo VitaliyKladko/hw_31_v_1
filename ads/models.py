@@ -40,8 +40,11 @@ class Ad(models.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'author': self.author,
+            'author_id': self.author.id,
+            'author': self.author.username,
             'price': self.price,
             'description': self.description,
-            'is_published': self.is_published
+            'category': self.category.name,
+            'is_published': self.is_published,
+            'image': self.image.url if self.image else None,
         }
