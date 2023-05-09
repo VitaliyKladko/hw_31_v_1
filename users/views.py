@@ -1,6 +1,7 @@
 import json
 
 from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.http import JsonResponse, Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -11,17 +12,17 @@ from users.models import User, Location
 
 
 class UserListView(ListView):
-    queryset = User.objects.order_by('username')
+    queryset = User.objects.annotate(total_ads=Count('ad', filter=Q(ad__is_published=True)))
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
+        paginator = Paginator(self.object_list.order_by('username'), settings.TOTAL_ON_PAGE)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         response = {
-            'items': [user.serialize() for user in page_obj],
+            'items': [{**user.serialize(), 'total_ads': user.total_ads} for user in page_obj],
             'total_pages': paginator.num_pages,
             'total_elements': paginator.count
         }
