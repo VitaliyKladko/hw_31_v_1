@@ -19,7 +19,7 @@ class CategoryListView(ListView):
         super().get(request, *args, **kwargs)
 
         response = []
-        for cat in self.object_list:
+        for cat in self.object_list.order_by('name'):
             response.append(cat.serialize())
 
         return JsonResponse(response, safe=False, status=200)
@@ -84,9 +84,9 @@ class AdListView(ListView):
     queryset = Ad.objects.order_by('-price')
 
     def get(self, request, *args, **kwargs):
-        all_ads = Ad.objects.all()
+        super().get(request, *args, **kwargs)
 
-        paginator = Paginator(all_ads, settings.TOTAL_ON_PAGE)
+        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
@@ -127,7 +127,6 @@ class AdCreateView(CreateView):
         return JsonResponse(ad.serialize(), status=201)
 
 
-# Здесь должен быть апдейт вью
 @method_decorator(csrf_exempt, name='dispatch')
 class AdUpdateView(UpdateView):
     model = Ad
@@ -156,6 +155,8 @@ class AdUpdateView(UpdateView):
         if 'is_published' in ad_update_data:
             self.object.is_published = ad_update_data['is_published']
 
+        self.object.save()
+
         return JsonResponse(self.object.serialize(), status=200)
 
 
@@ -170,3 +171,17 @@ class AdDeleteView(DeleteView):
         return JsonResponse({
             'status': 'Ok'
         }, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AdImageView(UpdateView):
+    model = Ad
+    fields = ['image']
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        self.object.image = request.FILES['image']
+        self.object.save()
+
+        return JsonResponse(self.object.serialize(), status=200)

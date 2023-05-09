@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:pk>/', ads.views.AdDetailView.as_view()),
     path('<int:pk>/delete/', ads.views.AdDeleteView.as_view()),
     path('<int:pk>/update/', ads.views.AdUpdateView.as_view()),
+    path('<int:pk>/upload_image/', ads.views.AdImageView.as_view()),
 ]

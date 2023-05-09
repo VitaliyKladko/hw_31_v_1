@@ -4,8 +4,8 @@ from django.db.models import TextChoices
 
 class Location(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    lng = models.DecimalField(max_digits=9, decimal_places=6)
+    lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Местоположение'
@@ -36,3 +36,14 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'role': self.role,
+            'age': self.age,
+            'locations': [loc.name for loc in self.locations.all()]
+        }
