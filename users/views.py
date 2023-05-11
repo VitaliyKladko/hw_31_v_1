@@ -6,40 +6,51 @@ from django.http import JsonResponse, Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from hw_28_v3 import settings
 from users.models import User, Location
+from users.serializers import UserListViewSerializer, UserRetrieveViewSerializer
 
 
-class UserListView(ListView):
-    queryset = User.objects.annotate(total_ads=Count('ad', filter=Q(ad__is_published=True)))
-
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-
-        paginator = Paginator(self.object_list.order_by('username'), settings.TOTAL_ON_PAGE)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-
-        response = {
-            'items': [{**user.serialize(), 'total_ads': user.total_ads} for user in page_obj],
-            'total_pages': paginator.num_pages,
-            'total_elements': paginator.count
-        }
-
-        return JsonResponse(response, status=200)
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserListViewSerializer
 
 
-class UserDetailView(DetailView):
-    model = User
+class UserDetailView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRetrieveViewSerializer
 
-    def get(self, request, *args, **kwargs):
-        try:
-            user = self.get_object()
-        except Http404:
-            return JsonResponse({'error': 'Not Found'}, status=404)
+# class UserListView(ListView):
+#     queryset = User.objects.annotate(total_ads=Count('ad', filter=Q(ad__is_published=True)))
+#
+#     def get(self, request, *args, **kwargs):
+#         super().get(request, *args, **kwargs)
+#
+#         paginator = Paginator(self.object_list.order_by('username'), settings.TOTAL_ON_PAGE)
+#         page_number = request.GET.get('page')
+#         page_obj = paginator.get_page(page_number)
+#
+#         response = {
+#             'items': [{**user.serialize(), 'total_ads': user.total_ads} for user in page_obj],
+#             'total_pages': paginator.num_pages,
+#             'total_elements': paginator.count
+#         }
+#
+#         return JsonResponse(response, status=200)
 
-        return JsonResponse(user.serialize(), status=200)
+
+# class UserDetailView(DetailView):
+#     model = User
+#
+#     def get(self, request, *args, **kwargs):
+#         try:
+#             user = self.get_object()
+#         except Http404:
+#             return JsonResponse({'error': 'Not Found'}, status=404)
+#
+#         return JsonResponse(user.serialize(), status=200)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
