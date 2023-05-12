@@ -88,3 +88,9 @@ class UserUpdateAPIViewSerializer(serializers.ModelSerializer):
             user.locations.add(loc_obj)
         user.save()
         return user
+
+
+class UserDestroyAPIViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id']
