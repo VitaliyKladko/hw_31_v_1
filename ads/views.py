@@ -1,6 +1,7 @@
 import json
 
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -86,7 +87,32 @@ class AdListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
+        # фильтрация ниже:
+        search_category_id = request.GET.getlist('cat', None)
+        category_q = None
+        for cat in search_category_id:
+            if category_q is None:
+                category_q = Q(category__id=cat)
+            else:
+                category_q |= Q(category__id=cat)
+
+        if category_q:
+            self.queryset = self.queryset.filter(category_q)
+
+        search_text = request.GET.get('text', None)
+        if search_text:
+            self.queryset = self.queryset.filter(name__icontains=search_text)
+
+        search_location = request.GET.get('location', None)
+        if search_location:
+            self.queryset = self.queryset.filter(author__locations__name__icontains=search_location)
+
+        price_from = request.GET.get('price_from', None)
+        price_to = request.GET.get('price_to', None)
+
+        self.queryset = self.queryset.filter(price__range=[price_from, price_to])
+
+        paginator = Paginator(self.queryset, settings.TOTAL_ON_PAGE)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
@@ -96,7 +122,7 @@ class AdListView(ListView):
             'total_elements': paginator.count
         }
 
-        return JsonResponse(response, status=200)
+        return JsonResponse(response, safe=False, status=200)
 
 
 class AdDetailView(DetailView):

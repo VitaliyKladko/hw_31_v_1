@@ -45,6 +45,7 @@ class Ad(models.Model):
             'price': self.price,
             'description': self.description,
             'category': self.category.name,
+            'category_id': self.category.id,
             'is_published': self.is_published,
             'image': self.image.url if self.image else None,
         }
