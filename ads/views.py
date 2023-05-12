@@ -109,8 +109,8 @@ class AdListView(ListView):
 
         price_from = request.GET.get('price_from', None)
         price_to = request.GET.get('price_to', None)
-
-        self.queryset = self.queryset.filter(price__range=[price_from, price_to])
+        if price_from and price_to:
+            self.queryset = self.queryset.filter(price__range=[price_from, price_to])
 
         paginator = Paginator(self.queryset, settings.TOTAL_ON_PAGE)
         page_number = request.GET.get('page')
