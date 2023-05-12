@@ -6,11 +6,11 @@ from django.http import JsonResponse, Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 
 from hw_28_v3 import settings
 from users.models import User, Location
-from users.serializers import UserListViewSerializer, UserRetrieveViewSerializer
+from users.serializers import UserListViewSerializer, UserRetrieveViewSerializer, UserCreateAPIViewSerializer
 
 
 class UserListView(ListAPIView):
@@ -21,6 +21,12 @@ class UserListView(ListAPIView):
 class UserDetailView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserRetrieveViewSerializer
+
+
+class UserCreateView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreateAPIViewSerializer
+
 
 # class UserListView(ListView):
 #     queryset = User.objects.annotate(total_ads=Count('ad', filter=Q(ad__is_published=True)))
@@ -53,21 +59,22 @@ class UserDetailView(RetrieveAPIView):
 #         return JsonResponse(user.serialize(), status=200)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class UserCreateView(CreateView):
-    model = User
-    fields = ['username', 'password', 'first_name', 'last_name', 'role', 'age', 'locations']
-
-    def post(self, request, *args, **kwargs):
-        user_data = json.loads(request.body)
-
-        locations = user_data.pop('locations')
-        user = User.objects.create(**user_data)
-        for loc_name in locations:
-            loc, _ = Location.objects.get_or_create(name=loc_name)
-            user.locations.add(loc)
-
-        return JsonResponse(user.serialize(), status=201)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class UserCreateView(CreateView):
+#     model = User
+#     fields = ['username', 'password', 'first_name', 'last_name', 'role', 'age', 'locations']
+#
+#     def post(self, request, *args, **kwargs):
+#         user_data = json.loads(request.body)
+#
+#         locations = user_data.pop('locations')
+#         user = User.objects.create(**user_data)
+#         for loc_name in locations:
+#
+#             loc, _ = Location.objects.get_or_create(name=loc_name)
+#             user.locations.add(loc)
+#
+#         return JsonResponse(user.serialize(), status=201)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
