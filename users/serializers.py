@@ -1,14 +1,6 @@
-from django.db.models import Count, Q
 from rest_framework import serializers
 
-from ads.models import Ad
 from users.models import Location, User
-
-
-# class LocationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Location
-#         fields = '__all__'
 
 
 class UserListViewSerializer(serializers.ModelSerializer):
@@ -94,3 +86,9 @@ class UserDestroyAPIViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id']
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
