@@ -41,7 +41,7 @@ class UserCreateAPIViewSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def is_valid(self, *, raise_exception=False):
-        self._location = self.initial_data.pop('locations')
+        self._location = self.initial_data.pop('locations', [])
         return super().is_valid(raise_exception=raise_exception)
 
     def create(self, validated_data):
@@ -50,6 +50,8 @@ class UserCreateAPIViewSerializer(serializers.ModelSerializer):
         for loc_name in self._location:
             loc, _ = Location.objects.get_or_create(name=loc_name)
             user.locations.add(loc)
+
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
@@ -68,7 +70,7 @@ class UserUpdateAPIViewSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def is_valid(self, *, raise_exception=False):
-        self._location = self.initial_data.pop('locations')
+        self._location = self.initial_data.pop('locations', [])
         return super().is_valid(raise_exception=raise_exception)
 
     def save(self, **kwargs):
