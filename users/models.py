@@ -23,10 +23,6 @@ class UserRoles(TextChoices):
 
 
 class User(AbstractUser):
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    username = models.CharField(max_length=200, unique=True)
-    password = models.CharField(max_length=200)
     age = models.PositiveSmallIntegerField(blank=True, null=True)
     locations = models.ManyToManyField(Location)
     role = models.CharField(max_length=9, choices=UserRoles.choices, default=UserRoles.MEMBER)

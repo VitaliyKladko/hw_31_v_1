@@ -18,8 +18,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-
-import ads.views
 from hw_28_v3 import settings
 from users.views import LocationViewSet
 
@@ -31,6 +29,7 @@ urlpatterns = [
     path('cat/', include('ads.urls.cat')),
     path('ad/', include('ads.urls.ad')),
     path('user/', include('users.urls')),
+    path('selection/', include('ads.urls.selection')),
 ]
 
 urlpatterns += router.urls
