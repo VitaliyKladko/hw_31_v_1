@@ -7,13 +7,14 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from ads.models import Category, Ad, Selection
-from ads.permissions import IsOwner
-from ads.serializers import AdRetrieveViewSerializer, SelectionSerializer, SelectionCreateSerializer
+from ads.permissions import IsOwner, IsAdOwner, IsStaff
+from ads.serializers import AdRetrieveViewSerializer, SelectionSerializer, SelectionCreateSerializer, \
+    AdUpdateSerializer, AdDestroyView
 from hw_28_v3 import settings
 from users.models import User
 
@@ -152,50 +153,61 @@ class AdCreateView(CreateView):
         return JsonResponse(ad.serialize(), status=201)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdUpdateView(UpdateView):
-    model = Ad
-    fields = ['name', 'author', 'price', 'description', 'category', 'is_published']
+class AdUpdateView(UpdateAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdUpdateSerializer
+    permission_classes = [IsAdOwner | IsStaff]
 
-    def patch(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class AdUpdateView(UpdateView):
+#     model = Ad
+#     fields = ['name', 'author', 'price', 'description', 'category', 'is_published']
+#
+#     def patch(self, request, *args, **kwargs):
+#         super().post(request, *args, **kwargs)
+#
+#         ad_update_data = json.loads(request.body)
+#
+#         if 'name' in ad_update_data:
+#             self.object.name = ad_update_data['name']
+#
+#         if 'author' in ad_update_data:
+#             self.object.author = get_object_or_404(User, pk=ad_update_data['author'])
+#
+#         if 'price' in ad_update_data:
+#             self.object.price = ad_update_data['price']
+#
+#         if 'description' in ad_update_data:
+#             self.object.description = ad_update_data['description']
+#
+#         if 'category' in ad_update_data:
+#             self.object.category = get_object_or_404(Category, pk=ad_update_data['category'])
+#
+#         if 'is_published' in ad_update_data:
+#             self.object.is_published = ad_update_data['is_published']
+#
+#         self.object.save()
+#
+#         return JsonResponse(self.object.serialize(), status=200)
 
-        ad_update_data = json.loads(request.body)
 
-        if 'name' in ad_update_data:
-            self.object.name = ad_update_data['name']
-
-        if 'author' in ad_update_data:
-            self.object.author = get_object_or_404(User, pk=ad_update_data['author'])
-
-        if 'price' in ad_update_data:
-            self.object.price = ad_update_data['price']
-
-        if 'description' in ad_update_data:
-            self.object.description = ad_update_data['description']
-
-        if 'category' in ad_update_data:
-            self.object.category = get_object_or_404(Category, pk=ad_update_data['category'])
-
-        if 'is_published' in ad_update_data:
-            self.object.is_published = ad_update_data['is_published']
-
-        self.object.save()
-
-        return JsonResponse(self.object.serialize(), status=200)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class AdDeleteView(DeleteView):
+#     model = Ad
+#     success_url = '/'
+#
+#     def delete(self, request, *args, **kwargs):
+#         super().delete(request, *args, **kwargs)
+#
+#         return JsonResponse({
+#             'status': 'Ok'
+#         }, status=200)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdDeleteView(DeleteView):
-    model = Ad
-    success_url = '/'
-
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-
-        return JsonResponse({
-            'status': 'Ok'
-        }, status=200)
+class AdDeleteView(DestroyAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdDestroyView
+    permission_classes = [IsAdOwner | IsStaff]
 
 
 @method_decorator(csrf_exempt, name='dispatch')

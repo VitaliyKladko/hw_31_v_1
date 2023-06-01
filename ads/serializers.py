@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from ads.models import Ad, Selection
+from ads.models import Ad, Selection, Category
+from users.models import User
 
 
 class AdRetrieveViewSerializer(serializers.ModelSerializer):
@@ -17,6 +18,18 @@ class AdRetrieveViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ad
         fields = "__all__"
+
+
+class AdUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ad
+        exclude = ['image']
+
+
+class AdDestroyView(serializers.ModelSerializer):
+    class Meta:
+        model = Ad
+        fields = ['id']
 
 
 class SelectionSerializer(serializers.ModelSerializer):
