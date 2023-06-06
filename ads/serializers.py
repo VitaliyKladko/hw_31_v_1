@@ -1,7 +1,18 @@
 from rest_framework import serializers
 
 from ads.models import Ad, Selection, Category
+from ads.validators import check_not_published
 from users.models import User
+
+
+class AdCreateAPIViewSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field='id', queryset=Category.objects.all())
+    author = serializers.SlugRelatedField(slug_field='id', queryset=User.objects.all())
+    is_published = serializers.BooleanField(validators=[check_not_published], required=False)
+
+    class Meta:
+        model = Ad
+        fields = "__all__"
 
 
 class AdRetrieveViewSerializer(serializers.ModelSerializer):
