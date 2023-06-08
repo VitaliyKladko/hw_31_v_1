@@ -5,9 +5,25 @@ from ads.validators import check_not_published
 from users.models import User
 
 
+class AdListSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    category = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True
+    )
+
+    class Meta:
+        model = Ad
+        fields = "__all__"
+
+
 class AdCreateAPIViewSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='id', queryset=Category.objects.all())
-    author = serializers.SlugRelatedField(slug_field='id', queryset=User.objects.all())
+    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    author = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
     is_published = serializers.BooleanField(validators=[check_not_published], required=False)
 
     class Meta:
@@ -69,4 +85,10 @@ class SelectionCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Selection
+        fields = '__all__'
+
+
+class CategoryViewSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
         fields = '__all__'
