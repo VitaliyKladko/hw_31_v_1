@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'ads',
     'users',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -142,11 +143,21 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
 # константа для увеличения жизни токена
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=10)
 }
 
 AUTH_USER_MODEL = 'users.User'
+
+# settings.py
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'HW#31 API',
+    'DESCRIPTION': 'My HW#31 API',
+    'VERSION': '1.0.0',
+}
