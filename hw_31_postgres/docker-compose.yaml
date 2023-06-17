@@ -1,0 +1,13 @@
+version: '3.2'
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=hw_31_postgres
+      - POSTGRES_USER=vitaliy
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./db/:/var/lib/postgresql/data

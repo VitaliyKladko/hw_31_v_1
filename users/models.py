@@ -35,7 +35,7 @@ class User(AbstractUser):
         message='Домен rambler.ru запрещен',
         inverse_match=True)],
         unique=True
-    )
+    )  # unique=True
 
     class Meta:
         verbose_name = 'Пользователь'

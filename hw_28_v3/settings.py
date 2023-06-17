@@ -82,8 +82,8 @@ WSGI_APPLICATION = 'hw_28_v3.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'hw_31_postgres',
+        'USER': 'vitaliy',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
